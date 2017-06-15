@@ -41,6 +41,7 @@ base_url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
 count = 0
 
+
 def get_download_url(url, size=512, flag=False):
     global base_url
     path = url
@@ -64,8 +65,9 @@ def download_url(url, title=None, ext=None, dim=None, path=None):
             file_name = url.split('/')[-1].split('.')[0]
             reg = re.compile('\_?[^0-9a-zA-Z]?([a-zA-z]+)[^0-9a-zA-z]?\_?')
             res = re.search(reg, file_name)
-            file_name =  res.groups()[0].strip('_') + '.' + ext
-            path = os.path.join(os.path.join(title, os.path.join(ext, '{}x{}'.format(dim, dim))), file_name)
+            file_name = res.groups()[0].strip('_') + '.' + ext
+            path = os.path.join(os.path.join(title, os.path.join(
+                ext, '{}x{}'.format(dim, dim))), file_name)
             path = os.path.join(down_path, path)
         if os.path.exists(path):
             ext = path.split('.')[-1]
@@ -77,7 +79,7 @@ def download_url(url, title=None, ext=None, dim=None, path=None):
             print "[Downloading]:", path
             with open(path, 'wb') as f:
                 total_length = int(r.headers.get('content-length'))
-                for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+                for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1):
                     if chunk:
                         f.write(chunk)
                         f.flush()
@@ -109,12 +111,12 @@ def download(url, page=None):
 
     title = container.xpath('.//h1[contains(@class, "page-title")]/text()')[0]
 
-
     icons = container.xpath(
         './/ul[contains(@class, "icon-lists")]/li[@class="icon"]')
 
     for icon in icons:
-        available = icon.xpath('.//p[@class="button"]/a[not(text()="MORE")]/@href')
+        available = icon.xpath(
+            './/p[@class="button"]/a[not(text()="MORE")]/@href')
         count += 1
         for extension in available:
             ext = extension.split('.')[-1]
@@ -126,9 +128,9 @@ def download(url, page=None):
                         url = get_download_url(extension)
                     download_url(url, title, ext, dim)
 
-pages = container.xpath('.//ul[@class="pagination"]/li[not(@class="active")]/a/@href')
+pages = container.xpath(
+    './/ul[@class="pagination"]/li[not(@class="active")]/a/@href')
 
 download(url, page)
 for page in pages:
     download(get_download_url(page))
-
