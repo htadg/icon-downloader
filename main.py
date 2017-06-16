@@ -1,14 +1,21 @@
 # !usr/bin/python
 
+from __future__ import print_function
+
 import os
 import re
+import six
 from random import randint
 
 import argparse
 import requests
-import urlparse
 from clint.textui import progress
 from lxml import html
+
+if six.PY2:
+    import urlparse
+else:
+    import urllib.parse as urlparse
 
 
 parser = argparse.ArgumentParser(
@@ -76,7 +83,7 @@ def download_url(url, title=None, ext=None, dim=None, path=None):
             download_url(url, path=path)
         else:
             r = requests.get(url, stream=True)
-            print "[Downloading]:", path
+            print('[Downloading]: ' + path)
             with open(path, 'wb') as f:
                 total_length = int(r.headers.get('content-length'))
                 for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1):
@@ -84,7 +91,7 @@ def download_url(url, title=None, ext=None, dim=None, path=None):
                         f.write(chunk)
                         f.flush()
     except Exception as e:
-        print '[ERROR]: {} -- {}'.format(e, url)
+        print('[ERROR]: {} -- {}'.format(e, url))
 
 page = requests.get(url)
 tree = html.fromstring(page.content)
